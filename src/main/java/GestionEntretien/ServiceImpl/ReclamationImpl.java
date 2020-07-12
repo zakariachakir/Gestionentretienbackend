@@ -76,7 +76,7 @@ public class ReclamationImpl implements ReclamationService {
             reclamation.setReclamentName(foundedReclamant.getNom() + ", " + foundedReclamant.getPrenom());
             reclamation.setDate(new Date());
             reclamation.setNomLocale(reclamation.getLocale().getDescriptionDropDown());
-            reclamation.setNomMateriel("Pas de materiel");
+            reclamation.setNomMateriel("Pas de matériel");
             reclamation.setReclament(foundedReclamant);
             //update reclamations of reclamant
             List<Reclamation> reclamationsUser = foundedReclamant.getReclamations();
@@ -106,7 +106,9 @@ public class ReclamationImpl implements ReclamationService {
 
             reclamation.setDescreptionDropDownReclamation(reclamation.getReference() + ", " + reclamation.getObjet());
             reclamationRepository.save(reclamation);
-
+            reclamation.setReference("REC"+String.valueOf(reclamation.getId()));
+            reclamation.setDescreptionDropDownReclamation(reclamation.getReference() + ", " + reclamation.getObjet());
+            reclamationRepository.save(reclamation);
             return 1;
         }
 

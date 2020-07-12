@@ -48,7 +48,7 @@ public class PrestationInterneImpl implements PrestationInterneService {
 
         if (preInterne.getAgent().getNomAgent() == null || preInterne.getAgent().getNomAgent().equals("") || preInterne.getLocale().getNomLocal() == null || preInterne.getLocale().getNomLocal().equals("")) {
             return -2;
-        } else if (preInterne.getTypeEntretienI().equals("materiel") && preInterne.getMaterielLocale().getReferenceML() == null) {
+        } else if (preInterne.getTypeEntretienI().equals("matériel") && preInterne.getMaterielLocale().getReferenceML() == null) {
             return -3;
         } else {
             //generate random string
@@ -63,7 +63,7 @@ public class PrestationInterneImpl implements PrestationInterneService {
 
             // set
             preInterne.setNomAgentI(preInterne.getAgent().getCodeAgent() + ", " + preInterne.getAgent().getNomAgent());
-            preInterne.setNomMaterielI("Pas de materiel");
+            preInterne.setNomMaterielI("Pas de matériel");
 
             // update liste prestationInterne du locale
             addPrestationToListOfPrestationsofLocale(preInterne);
@@ -81,7 +81,7 @@ public class PrestationInterneImpl implements PrestationInterneService {
             }
 
             //si pres d un materiel donc il sagit d un entretien
-            if (preInterne.getTypeEntretienI().equals("materiel")) {
+            if (preInterne.getTypeEntretienI().equals("matériel")) {
 
                 // find from database
                 LocalDetails foundedMateriel = localDetailsRepository.findByReferenceML(preInterne.getMaterielLocale().getReferenceML());
@@ -95,7 +95,8 @@ public class PrestationInterneImpl implements PrestationInterneService {
                 ent.setMateriel(foundedMateriel);
                 ent.setNomLocale(preInterne.getLocale().getDescriptionDropDown());
                 entretienRepository.save(ent);
-
+                ent.setNumFacture("Ent"+String.valueOf(ent.getId()));
+                entretienRepository.save(ent);
                 // update liste des entretiens
                 addEntretienToListOfEntretiensOfMateriel(foundedMateriel, ent);
 
@@ -108,6 +109,8 @@ public class PrestationInterneImpl implements PrestationInterneService {
                 preInterne.setMaterielLocale(null);
             }
 
+            prestationInterneRepository.save(preInterne);
+            preInterne.setReferenceI("PresI"+String.valueOf(preInterne.getId()));
             prestationInterneRepository.save(preInterne);
             // set this prestation to reclamation
             if (preInterne.isReclamedI()) {
@@ -127,7 +130,7 @@ public class PrestationInterneImpl implements PrestationInterneService {
             return -1;
         } else if (preInterne.isReclamedI() && preInterne.getReclamationI() == null) {
             return -2;
-        } else if (preInterne.getTypeEntretienI().equals("materiel") && preInterne.getMaterielLocale() == null) {
+        } else if (preInterne.getTypeEntretienI().equals("matériel") && preInterne.getMaterielLocale() == null) {
             return -4;
         } else {
             //update attriibutes de bases
@@ -183,7 +186,7 @@ public class PrestationInterneImpl implements PrestationInterneService {
             foundedPrestationInterne.setNomLocaleI(preInterne.getLocale().getDescriptionDropDown());
 
             //update Materiel
-            if (preInterne.getTypeEntretienI().equals("materiel")) {
+            if (preInterne.getTypeEntretienI().equals("matériel")) {
 
                 // find Entretien associe
                 Entretien loadedEntretien = entretienRepository.findByNumFacture(foundedPrestationInterne.getReferenceI());

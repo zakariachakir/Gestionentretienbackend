@@ -51,7 +51,7 @@ public class PrestationExterneImpl implements PrestationExterneService {
     public int save(PrestationExterne prestationExterne) {
         if (prestationExterne.getLocale().getReference() == null) {
             return -1;
-        } else if (prestationExterne.getMaterielLocale().getReferenceML() == null && prestationExterne.getTypeEntretienE().equals("materiel")) {
+        } else if (prestationExterne.getMaterielLocale().getReferenceML() == null && prestationExterne.getTypeEntretienE().equals("matériel")) {
             return -2;
         } else if (prestationExterne.isReclamedE() && prestationExterne.getReclamationE().getReference() == null) {
             return -3;
@@ -83,10 +83,10 @@ public class PrestationExterneImpl implements PrestationExterneService {
             localeRepository.save(loadedLocale);
             // set
             prestationExterne.setNomLocale(loadedLocale.getDescriptionDropDown());
-            prestationExterne.setNomMateriel("Pas de materiel");
+            prestationExterne.setNomMateriel("Pas de matériel");
 
             // update liste prestations du materiel and create entretien
-            if (prestationExterne.getTypeEntretienE().equals("materiel")) {
+            if (prestationExterne.getTypeEntretienE().equals("matériel")) {
                 LocalDetails loadedLocaleDetails = localDetailsRepository.findByReferenceML(prestationExterne.getMaterielLocale().getReferenceML());
                 List<PrestationExterne> prestationsM = loadedLocaleDetails.getPrestationExternes();
                 prestationsM.add(prestationExterne);
@@ -103,6 +103,8 @@ public class PrestationExterneImpl implements PrestationExterneService {
                 entretien.setNomLocale(loadedLocale.getDescriptionDropDown());
                 entretien.setNomMateriel(loadedLocaleDetails.getDescriptionMaterielLocale());
                 entretien.setPrestataire(prestationExterne.getNomPrestataireE());
+                entretienRepository.save(entretien);
+                entretien.setNumFacture("Ent"+String.valueOf(entretien.getId()));
                 entretienRepository.save(entretien);
                 // update liste entretien du locale et materiel
                 // locale
@@ -162,7 +164,8 @@ public class PrestationExterneImpl implements PrestationExterneService {
 
             // save prestation Externe
             prestationExterneRepository.save(prestationExterne);
-
+            prestationExterne.setReferenceE("PresE"+String.valueOf(prestationExterne.getId()));
+            prestationExterneRepository.save(prestationExterne);
             // set this pres to reclamation and bon commande and bon livraison si existes
             // reclamation
             if (prestationExterne.isReclamedE()) {
@@ -173,12 +176,16 @@ public class PrestationExterneImpl implements PrestationExterneService {
             // bon Commande
             if (prestationExterne.isBonCommandeE()) {
                 PresBonCommande loadedPresBonCommande = presBonCommandeRepository.findByReference(prestationExterne.getPresBonCommandeE().getReference());
+                loadedPresBonCommande.setReference(prestationExterne.getReferenceE());
+                loadedPresBonCommande.setNomPrestationAssocie(prestationExterne.getReferenceE() + ", " + prestationExterne.getTypeEntretienE());
                 loadedPresBonCommande.setPrestationExterne(prestationExterne);
                 presBonCommandeRepository.save(loadedPresBonCommande);
             }
             // bon Livraison
             if (prestationExterne.isBonLivraisonE()) {
                 PresBonLivraison loadedPresBonLivraison = presBonLivraisonRepository.findByReference(prestationExterne.getPresBonLivraisonE().getReference());
+                loadedPresBonLivraison.setReference(prestationExterne.getReferenceE());
+                loadedPresBonLivraison.setNomPrestationAssocie(prestationExterne.getReferenceE() + ", " + prestationExterne.getTypeEntretienE());
                 loadedPresBonLivraison.setPrestationExterneL(prestationExterne);
                 presBonLivraisonRepository.save(loadedPresBonLivraison);
             }
@@ -190,9 +197,9 @@ public class PrestationExterneImpl implements PrestationExterneService {
     public int update(PrestationExterne prestationExterne) {
         PrestationExterne loadedPrestationExterne = prestationExterneRepository.findByReferenceE(prestationExterne.getReferenceE());
 
-        if (prestationExterne.getTypeEntretienE().equals("materiel") && prestationExterne.getMaterielLocale() == null) {
+        if (prestationExterne.getTypeEntretienE().equals("matériel") && prestationExterne.getMaterielLocale() == null) {
             return -1;
-        } else if (prestationExterne.getTypeEntretienE().equals("materiel") && prestationExterne.getMaterielLocale().getReferenceML() == null) {
+        } else if (prestationExterne.getTypeEntretienE().equals("matériel") && prestationExterne.getMaterielLocale().getReferenceML() == null) {
             return 0;
         } else if (prestationExterne.getLocale().getReference() == null) {
             return -2;
@@ -208,9 +215,9 @@ public class PrestationExterneImpl implements PrestationExterneService {
                 || prestationExterne.getPresBonLivraisonE().getNumeroBonLivraison() == null
                 || prestationExterne.getPresBonLivraisonE().getDateBonLivraison() == null)) {
             return -5;
-        } else if (loadedPrestationExterne.getTypeEntretienE().equals("materiel") == false && prestationExterne.getTypeEntretienE().equals("materiel")) {
+        } else if (loadedPrestationExterne.getTypeEntretienE().equals("matériel") == false && prestationExterne.getTypeEntretienE().equals("matériel")) {
             return -6;
-        } else if (loadedPrestationExterne.getTypeEntretienE().equals("materiel") && prestationExterne.getTypeEntretienE().equals("materiel") == false) {
+        } else if (loadedPrestationExterne.getTypeEntretienE().equals("matériel") && prestationExterne.getTypeEntretienE().equals("matériel") == false) {
             return -7;
         } else if (loadedPrestationExterne.isBonCommandeE() && !prestationExterne.isBonCommandeE()) {
             return -8;
@@ -252,7 +259,7 @@ public class PrestationExterneImpl implements PrestationExterneService {
                 loadedPrestationExterne.setLocale(loadedNewLocale);
                 loadedPrestationExterne.setNomLocale(loadedNewLocale.getDescriptionDropDown());
             }
-            if (prestationExterne.getTypeEntretienE().equals("materiel") && loadedPrestationExterne.getTypeEntretienE().equals("materiel")) {
+            if (prestationExterne.getTypeEntretienE().equals("matériel") && loadedPrestationExterne.getTypeEntretienE().equals("matériel")) {
                 if (!loadedPrestationExterne.getMaterielLocale().getReference().equals(prestationExterne.getMaterielLocale().getReference())) {
                     LocalDetails loadedOldMateriel = localDetailsRepository.findByReferenceML(loadedPrestationExterne.getMaterielLocale().getReferenceML());
                     LocalDetails loadedNewMateriel = localDetailsRepository.findByReferenceML(prestationExterne.getMaterielLocale().getReferenceML());
