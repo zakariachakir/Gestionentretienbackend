@@ -25,7 +25,7 @@ import GestionEntretien.Service.FournisseurSVService;
  * @author lenovo
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4201")
 @RequestMapping("GestionEntretien/fournisseur")
 public class FournisseurSVRset {
 

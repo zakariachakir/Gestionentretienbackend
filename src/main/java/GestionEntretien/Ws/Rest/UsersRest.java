@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.PutMapping;
  * @author Zakaria
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4201")
 @RequestMapping("GestionEntretien/Login")
 public class UsersRest {
 
